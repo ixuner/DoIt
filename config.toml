@@ -280,27 +280,14 @@ theme = "DoIt"
     #  评论系统设置
     [params.page.comment]
       enable = true
-      # Valine 评论系统设置
-      [params.page.comment.valine]
+      #  Twikoo 评论系统设置
+      [params.page.comment.twikoo]
         enable = true
-        appId = "8GP2HS8dCgEEdRaxUzYlXE2A-MdYXbMMI"
-        appKey = "qAlyKkcLDEm44Kwy1NdSyDOz"
-        placeholder = ""
-        avatar = "mp"
-        meta= ""
-        pageSize = 10
-        lang = ""
+        envId = "https://twikoo-bay.vercel.app"
+        region = ""
+        path = ""
         visitor = true
-        recordIP = false
-        highlight = false
-        enableQQ = false
-        serverURLs = ""
-        #  emoji 数据文件名称, 默认是 "google.yml"
-        # ("apple.yml", "google.yml", "facebook.yml", "twitter.yml")
-        # 位于 "themes/LoveIt/assets/data/emoji/" 目录
-        # 可以在你的项目下相同路径存放你自己的数据文件:
-        # "assets/data/emoji/"
-        emoji = ""
+        commentCount = true
 
 
   #  网站分析配置
