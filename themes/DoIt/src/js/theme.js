@@ -199,7 +199,7 @@ function initSearch() {
         });
         window.clickMaskEventSet.add(window._searchDesktopOnClickMask);
         window.pjaxSendEventSet.add(window._searchDesktopOnClickMask);
-        window.pjaxSendEventSet.add(() => {window._searchDesktopOnce = false; window._searchMobileOnce = false;});
+        window.pjaxSendEventSet.add(() => { window._searchDesktopOnce = false; window._searchMobileOnce = false; });
     }
     $searchInput.addEventListener('input', () => {
         if ($searchInput.value === '') $searchClear.style.display = 'none';
@@ -563,28 +563,38 @@ function initToc() {
                 $toc.style.position = 'fixed';
                 $toc.style.top = `${TOP_SPACING}px`;
             }
-
+            if ($tocLinkElements.length === 0) return;
+            const content = document.getElementById('content');
             forEach($tocLinkElements, $tocLink => { $tocLink.classList.remove('active'); });
             forEach($tocLiElements, $tocLi => { $tocLi.classList.remove('has-active'); });
             const INDEX_SPACING = 20 + (headerIsFixed ? headerHeight : 0);
-            let activeTocIndex = $headerLinkElements.length - 1;
-            for (let i = 0; i < $headerLinkElements.length - 1; i++) {
-                const thisTop = $headerLinkElements[i].getBoundingClientRect().top;
-                const nextTop = $headerLinkElements[i + 1].getBoundingClientRect().top;
-                if ((i == 0 && thisTop > INDEX_SPACING)
-                    || (thisTop <= INDEX_SPACING && nextTop > INDEX_SPACING)) {
-                    activeTocIndex = i;
-                    break;
+            let activeTocIndex = -1;
+            if (content.getBoundingClientRect().top <= INDEX_SPACING
+                && content.getBoundingClientRect().bottom > INDEX_SPACING
+                && $headerLinkElements[0].getBoundingClientRect().top <= INDEX_SPACING) {
+                if ($headerLinkElements[$headerLinkElements.length -1].getBoundingClientRect().top < INDEX_SPACING) {
+                    activeTocIndex = $headerLinkElements.length - 1;
+                }
+                else {
+                    for (let i = 0; i < $headerLinkElements.length - 1; i++) {
+                        const thisTop = $headerLinkElements[i].getBoundingClientRect().top;
+                        const nextTop = $headerLinkElements[i + 1].getBoundingClientRect().top;
+                        if (thisTop <= INDEX_SPACING && nextTop > INDEX_SPACING) {
+                            activeTocIndex = i;
+                            break;
+                        }
+                    }
+                }
+                if (activeTocIndex >= 0 && activeTocIndex < $tocLinkElements.length) {
+                    $tocLinkElements[activeTocIndex].classList.add('active');
+                    let $parent = $tocLinkElements[activeTocIndex].parentElement;
+                    while ($parent !== $tocCore) {
+                        $parent.classList.add('has-active');
+                        $parent = $parent.parentElement.parentElement;
+                    }
                 }
             }
-            if (activeTocIndex >= 0 && activeTocIndex < $tocLinkElements.length) {
-                $tocLinkElements[activeTocIndex].classList.add('active');
-                let $parent = $tocLinkElements[activeTocIndex].parentElement;
-                while ($parent !== $tocCore) {
-                    $parent.classList.add('has-active');
-                    $parent = $parent.parentElement.parentElement;
-                }
-            }
+            history.replaceState(history.state, null, activeTocIndex === -1 ? ' ' : $tocLinkElements[activeTocIndex].href);
         });
         window._tocOnScroll();
         window.scrollEventSet.add(window._tocOnScroll);
@@ -736,7 +746,7 @@ function initComment() {
                         window.location.pathname
                     ],
                     includeReply: false
-                  }).then(function (res) {
+                }).then(function (res) {
                     // example: [
                     //   { url: '/2020/10/post-1.html', count: 10 },
                     //   { url: '/2020/11/post-2.html', count: 0 },
@@ -745,11 +755,11 @@ function initComment() {
                     // If there is an element with id="twikoo-comment-count", set its innerHTML to the count of comments
                     const $twikooCommentCount = document.getElementById('twikoo-comment-count');
                     if ($twikooCommentCount) $twikooCommentCount.innerHTML = res[0].count;
-                  }).catch(function (err) {
+                }).catch(function (err) {
                     console.error(err);
-                  });
+                });
             }
-        } 
+        }
         if (window.config.comment.utterances) {
             const utterancesConfig = window.config.comment.utterances;
             const script = document.createElement('script');
@@ -802,7 +812,7 @@ function initComment() {
                 simple_view: remark42.simple_view
             };
             window.remark_config = remark_config;
-            !function(e,n){for(var o=0;o<e.length;o++){var r=n.createElement("script"),c=".js",d=n.head||n.body;"noModule"in r?(r.type="module",c=".mjs"):r.async=!0,r.defer=!0,r.src=remark_config.host+"/web/"+e[o]+c,d.appendChild(r)}}(remark_config.components||["embed"],document);
+            !function (e, n) { for (var o = 0; o < e.length; o++) { var r = n.createElement("script"), c = ".js", d = n.head || n.body; "noModule" in r ? (r.type = "module", c = ".mjs") : r.async = !0, r.defer = !0, r.src = remark_config.host + "/web/" + e[o] + c, d.appendChild(r) } }(remark_config.components || ["embed"], document);
             window._remark42OnSwitchTheme = (() => {
                 if (window.isDark) {
                     window.REMARK42.changeTheme('dark');
@@ -1015,6 +1025,10 @@ document.addEventListener('pjax:send', function () {
     for (let event of window.clickMaskEventSet) event();
     document.body.classList.remove('blur');
     delete window._tocOnScroll;
+    let el = document.getElementById('content');
+    if (el) {
+        window.lgData[el?.getAttribute('lg-uid')].destroy(true)
+    }
 });
 
 topbar.config({

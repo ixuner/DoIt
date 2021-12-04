@@ -8,7 +8,7 @@ hasCJKLanguage = true
 # 网站标题
 title = "ixuner's blog"
   # 网站描述
-  description = "这是我的全新 Hugo 网站"
+  description = "这是我的全新博客"
   
 # 更改使用 Hugo 构建网站时使用的默认主题
 theme = "DoIt"
