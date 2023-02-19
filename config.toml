@@ -283,7 +283,7 @@ theme = "DoIt"
       #  Twikoo 评论系统设置
       [params.page.comment.twikoo]
         enable = true
-        envId = "https://twikoo-bay.vercel.app"
+        envId = "https://twikoo.ixuner.top"
         region = ""
         path = ""
         visitor = true
